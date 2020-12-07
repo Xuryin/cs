@@ -1,6 +1,5 @@
 <template>
   <div class="details-page">
-    <subTitle :titleID="0"/>
     <div class="details-content">
       <div class="details-title">
         <span>时间</span>
@@ -30,11 +29,11 @@
 </template>
 
 <script>
-import { subTitle } from './index'
+
 export default {
   name: 'balance',
   components: {
-    subTitle
+
   },
   data () {
     return {

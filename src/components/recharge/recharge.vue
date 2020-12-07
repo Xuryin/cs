@@ -1,6 +1,5 @@
 <template>
   <div class="recharge-page">
-    <subTitle :titleID="0"/>
     <div class="recharge-mount">
       <p>充值金额</p>
       <div class="mount-item">
@@ -36,16 +35,16 @@
       <p></p>
       <button>确认支付</button>
     </div>
+
+
   </div>
 </template>
 
 <script>
-import { subTitle } from './index';
+
 export default {
   name: 'recharge',
-  components: {
-    subTitle
-  },
+
   data () {
     return {
       mountData: [

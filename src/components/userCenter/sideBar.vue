@@ -68,6 +68,7 @@ export default {
   height 640px
   width 254px
   background-color #1E242A
+  border-radius 8px
 
   .side-portrait
     height 220px

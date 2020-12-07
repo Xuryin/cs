@@ -1,13 +1,64 @@
 <template>
-$END$
+  <div class="recharge-page">
+    <div class="router-title">
+      <p v-for="item in navData" :class="routerIndex == item.id? 'active': ''" @click="changeRouter(item.id)">
+        {{ item.name }}</p>
+    </div>
+    <balance v-if="routerIndex == 1"/>
+    <recharge v-if="routerIndex == 0"/>
+
+  </div>
 </template>
 
 <script>
+import balance from './balance';
+import recharge from './recharge';
 export default {
-name: "index"
-}
+  name: 'index',
+  data () {
+    return {
+      routerIndex: 0,
+      navData:  [ {id: 0, name: '充值'}, {id: 1, name: '余额明细'} ],
+    }
+  },
+  methods: {
+    changeRouter (index) {
+      console.log(index)
+      this.routerIndex = index
+    }
+  },
+  components: { balance, recharge }
+};
 </script>
 
-<style scoped>
+<style scoped lang="stylus">
+.recharge-page
+  width 930px
+  height 678px
+
+  .router-title
+    width: 930px
+    height: 64px
+    background #262C32
+    border-radius 8px 8px 0 0
+    display flex
+    padding 24px 36px
+
+    p
+      width: 106px;
+      height: 40px;
+      text-align center
+      line-height 40px
+      color #FFFFFF
+      border-top: 2px solid #54616D;
+      background: #363E46;
+      cursor pointer
+
+    p:not(:first-child)
+      margin-left 24px
+
+.active
+  background: linear-gradient(180deg, #203E50, #363E46) !important;
+  border-top 2px solid #3AA9EA !important;
 
 </style>

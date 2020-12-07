@@ -1,27 +1,61 @@
 import Vue from 'vue';
 import VueRouter from 'vue-router';
-import Home from '../views/Home.vue';
+import Index from '../views/Index.vue';
 
 Vue.use(VueRouter);
 
 const routes = [
   {
     path: '/',
-    name: 'Home',
-    component: Home,
-  },
-  {
-    path: '/about',
-    name: 'About',
-    // route level code-splitting
-    // this generates a separate chunk (about.[hash].js) for this route
-    // which is lazy-loaded when the route is visited.
-    component: () => import(/* webpackChunkName: "about" */ '../views/About.vue'),
-  },
+    redirect: '/home',
+    component: Index,
+    children: [
+      {
+        path: '/home',
+        name: 'Home',
+        component: () => import('@/views/Home.vue'),
+      },
+      {
+        path: '/userCenter',
+        name: 'userCenter',
+        redirect: '/recharge',
+        component: () => import('@/views/userCenter.vue'),
+        children: [
+          {
+            path: '/recharge',
+            name: 'recharge',
+            component: () => import('@/components/recharge/index'),
+          },
+          {
+            path: '/recaption',
+            name: 'recaption',
+            component: () => import('@/components/recaption/index'),
+          }
+        ]
+      },
+      {
+        path: '/replacing',
+        name: 'replacing',
+        component: () => import('@/components/replacing/index'),
+      },,
+      {
+        path: '/shop',
+        name: 'shop',
+        component: () => import('@/components/replacing/index'),
+      }
+    ]
+  }
 ];
 
 const router = new VueRouter({
   routes,
 });
+
+/* 解决重复点击路由的报错 */
+const originalPush = VueRouter.prototype.push
+
+VueRouter.prototype.push = function push(location) {
+  return originalPush.call(this, location).catch(err => err)
+}
 
 export default router;

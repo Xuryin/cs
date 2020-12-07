@@ -108,11 +108,11 @@ export default {
 
 <style scoped lang="stylus">
 .details-page
-  height 740px
+  height 614px
+  padding 20px 36px
 
   .details-content
-    height 600px
-    margin  20px 36px
+    height 530px
     overflow hidden
 
   .details-title
@@ -170,7 +170,7 @@ export default {
     width 836px
     text-align right
     position fixed
-    bottom -40px
+    bottom 15px
     right 36px
     line-height 42px
 .fontRed
