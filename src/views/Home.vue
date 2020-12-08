@@ -1,6 +1,6 @@
 <template>
   <div class="home">
-    <div v-for="item in boxData" class="box-content">
+    <div v-for="item in boxData" >
       <BoxItem :boxData="item"/>
     </div>
   </div>
@@ -37,6 +37,24 @@ export default {
             {id: 2,url: require('@assets/img/box_2.png'), content: require('@assets/img/gun_2.png'), name: '箱子名称', price: 10},
             {id: 3,url: require('@assets/img/box_3.png'), content: require('@assets/img/knife_1.png'), name: '箱子名称', price: 10},
           ] },
+        { title: '福利宝箱',
+          bgUrl: require('@assets/img/img_fulibox.png'),
+          content: [
+            {id: 1,url: require('@assets/img/box_1.png'), content: require('@assets/img/gun_1.png'), name: '箱子名称', price: 10},
+            {id: 2,url: require('@assets/img/box_2.png'), content: require('@assets/img/gun_2.png'), name: '箱子名称', price: 10},
+            {id: 3,url: require('@assets/img/box_3.png'), content: require('@assets/img/knife_1.png'), name: '箱子名称', price: 10},
+            {id: 3,url: require('@assets/img/box_3.png'), content: require('@assets/img/knife_1.png'), name: '箱子名称', price: 10},
+            {id: 3,url: require('@assets/img/box_3.png'), content: require('@assets/img/knife_1.png'), name: '箱子名称', price: 10},
+          ] },
+        { title: '福利宝箱',
+          bgUrl: require('@assets/img/img_fulibox.png'),
+          content: [
+            {id: 1,url: require('@assets/img/box_1.png'), content: require('@assets/img/gun_1.png'), name: '箱子名称', price: 10},
+            {id: 2,url: require('@assets/img/box_2.png'), content: require('@assets/img/gun_2.png'), name: '箱子名称', price: 10},
+            {id: 3,url: require('@assets/img/box_3.png'), content: require('@assets/img/knife_1.png'), name: '箱子名称', price: 10},
+            {id: 3,url: require('@assets/img/box_3.png'), content: require('@assets/img/knife_1.png'), name: '箱子名称', price: 10},
+            {id: 3,url: require('@assets/img/box_3.png'), content: require('@assets/img/knife_1.png'), name: '箱子名称', price: 10},
+          ] },
       ]
     }
   },
@@ -54,12 +72,8 @@ export default {
 </script>
 
 <style scoped lang="stylus">
-.home-header
+.home
   margin-bottom 60px
+  overflow-y auto
 
-.box-content
-  width 1200px
-  margin-left 50%
-  transform translateX(-600px)
-  margin-top 10px
 </style>

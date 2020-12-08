@@ -2,7 +2,13 @@
   <div class="home">
     <topScroll/>
     <Header class="home-header"/>
-      <router-view></router-view>
+    <div class="home-content">
+      <div class="home-container">
+        <router-view></router-view>
+      </div>
+
+    </div>
+    <server/>
     <Footer class="home-footer"/>
   </div>
 </template>
@@ -10,6 +16,7 @@
 <script>
 import { topScroll, Header, BoxItem, Footer } from '@/components/Home'
 import { mapMutationsm, mapState } from 'vuex';
+import server from '@/components/extra/server'
 export default {
   name: 'Home',
   data () {
@@ -38,11 +45,12 @@ export default {
             {id: 2,url: require('@assets/img/box_2.png'), content: require('@assets/img/gun_2.png'), name: '箱子名称', price: 10},
             {id: 3,url: require('@assets/img/box_3.png'), content: require('@assets/img/knife_1.png'), name: '箱子名称', price: 10},
           ] },
-      ]
+      ],
+      active: 1
     }
   },
   components: {
-    topScroll, Header, BoxItem, Footer
+    topScroll, Header, BoxItem, Footer, server
   },
   methods :{
 
@@ -55,16 +63,13 @@ export default {
 </script>
 
 <style scoped lang="stylus">
-.home-header
-  margin-bottom 60px
-
-.box-content
-  width 1200px
-  margin-left 50%
-  transform translateX(-600px)
-  margin-top 30px
-
-.home-footer
-  position fixed
-  bottom 0
+.home-content
+  width 100%
+  overflow-y scroll
+  .home-container
+    width 1200px
+    margin-left 50%
+    min-height 900px
+    overflow-y auto
+    transform translateX(-600px)
 </style>

@@ -34,7 +34,6 @@ export default {
 <style scoped lang="stylus">
 .recharge-page
   width 930px
-  height 678px
 
   .router-title
     width: 930px

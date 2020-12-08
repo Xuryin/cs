@@ -62,8 +62,7 @@ export default {
 <style scoped lang="stylus">
 .replacing-page
   width 1200px
-  margin-left 50%
-  transform translateX(-600px)
+  margin-top 20px
   .replacing-text
     color #fff
     p:nth-child(1)

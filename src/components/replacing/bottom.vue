@@ -241,9 +241,4 @@ export default {
     .dec-bottom-right
       .bottom-left-title
         background #2A2F4C
-
-
-
-
-
 </style>

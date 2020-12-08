@@ -21,6 +21,4 @@ export default ({
   -webkit-font-smoothing antialiased
   -moz-osx-font-smoothing grayscale
 
-.home-header
-  margin-bottom 60px
 </style>

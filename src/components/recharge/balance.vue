@@ -119,7 +119,7 @@ export default {
 
 <style scoped lang="stylus">
 .details-page
-  height 678px
+  height 614px
 
   .details-content
     height 530px

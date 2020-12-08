@@ -60,7 +60,7 @@ export default {
   watch: {
     $route: {
       handler: function (val, oldVal) {
-        console.log(val.name)
+        // console.log(val.name)
         this.routerName = val.name
       },
       deep: true
@@ -75,7 +75,6 @@ export default {
 
 <style scoped lang="stylus">
 .home-header
-  height 96px
   width 100%
   .header-container
     position relative
@@ -148,7 +147,6 @@ export default {
     transform translateX(-434px)
     background url(../../assets/img/header_bottom_bg.png) no-repeat 0 0
     background-size 100% 100%
-
     display flex
     justify-content center
 

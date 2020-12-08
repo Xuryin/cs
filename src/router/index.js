@@ -37,11 +37,21 @@ const routes = [
         path: '/replacing',
         name: 'replacing',
         component: () => import('@/components/replacing/index'),
-      },,
+      },
+      {
+        path: '/boxDetail',
+        name: 'boxDetail',
+        component: () => import('@/components/boxDetail/index'),
+      },
       {
         path: '/shop',
         name: 'shop',
         component: () => import('@/components/replacing/index'),
+      },
+      {
+        path: `helper/:id`,
+        name: 'helper',
+        component: () => import('@/views/helper'),
       }
     ]
   }

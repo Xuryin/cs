@@ -52,10 +52,7 @@ export default {
 
 <style scoped lang="stylus">
 .user-center
-  width 1200px
-  margin-left 50%
-  transform translateX(-600px)
-  margin-top 80px
+  margin-top 40px
   display flex
   justify-content center
 
