@@ -47,23 +47,22 @@
 <script>
 import { mapState, mapMutations } from 'vuex';
 import { logout } from '@api/user';
-import { setItem } from '@utils/tools';
-import { bus } from '@utils/bus';
 
 export default {
   name: 'priceModal',
   data() {
     return {
-      message: ''
+      message: '',
+      showModal: false
     };
   },
   props: [],
   methods: {
-    ...mapMutations(['changeModalStates','changeLoginStatus']),
+    ...mapMutations(['changeModalStates','setUserInfo']),
     login() {
     },
     close() {
-      this.$store.commit('changeModalStates', {
+      this.changeModalStates({
         index: 0,
         name: ''
       });
@@ -75,9 +74,8 @@ export default {
           if (res.code == 0) {
             this.$router.push({ name: 'replacing' });
             this.close()
-            setItem('userInfo', {})
-            this.$store.commit('changeLoginStatus', false)
-            bus.$emit('login', false)
+            localStorage.removeItem('userInfo')
+            this.setUserInfo(null)
           }
         });
       }
@@ -88,10 +86,10 @@ export default {
     },
   },
   created() {
-
+    this.showModal = this.isShowModal
   },
   computed: {
-    ...mapState(['modalShowName', 'subTitle', 'qrcode', 'payAmount', 'modalTitle']),
+    ...mapState(['modalShowName', 'subTitle', 'qrcode', 'payAmount', 'modalTitle','isShowModal']),
   }
 };
 </script>

@@ -3,7 +3,7 @@ import Vuex from 'vuex';
 
 Vue.use(Vuex);
 import {userInfo} from '@api/user';
-import {setItem,getItem} from '@utils/tools';
+import {setItem, getItem} from '@utils/tools';
 
 export default new Vuex.Store({
   state: {
@@ -14,15 +14,14 @@ export default new Vuex.Store({
     subTitle: '' ,// 提示弹窗文字,
     modalTitle: '',
     qrCode: '',
-    payAmount: '',
-    isLogin: getItem('userInfo') ? 1 : 0
+    payAmount: ''
   },
   getters: {
-    getUserInfo(state) {
-
+    userInfo(state) {
+      return state.userInfo
     },
     isLogin(state) {
-      return state.isLogin
+      return state.userInfo ? 1 : false
     }
   },
   mutations: {
@@ -46,11 +45,7 @@ export default new Vuex.Store({
       return arrObj[0]
     },
     setUserInfo: (state, data) => {
-      if (!data) {
-        localStorage.removeItem('userInfo')
-      }
       state.userInfo = data
-      console.log(data)
     }
   },
   actions: {},

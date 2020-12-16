@@ -13,12 +13,12 @@
         </div>
       </div>
 
-      <div class="header-login" v-if="!isLoginFlag">
+      <div class="header-login" v-if="!isLogin">
         <p @click="openModal('password')">登录</p>
         <p @click="openModal('register')">注册</p>
       </div>
 
-      <div class="header-info" v-if="isLoginFlag" @click="goRecharge">
+      <div class="header-info" v-else @click="goRecharge">
         <div>
           <img :src="userInfo.avatarFull" alt="">
         </div>
@@ -40,11 +40,9 @@
 </template>
 
 <script>
-import { mapState, mapMutations, mapGetters } from 'vuex'
+import { mapMutations, mapGetters } from 'vuex'
 import { getItem, setItem, formatMoney } from '@utils/tools';
-import { userInfo } from '@api/user';
 import { indexHistory } from '@api/trade';
-import {bus} from '@utils/bus';
 
 export default {
   name: 'Header',
@@ -64,8 +62,7 @@ export default {
         {src: require('@assets/img/icon_yikaixiang.png') , number: 2, per: '开箱',  color: '#0066FF'},
         {src: require('@assets/img/icon_yiquhui.png') , number: 3, per: '已取回',  color: '#B716F3'},
       ],
-      isLoginFlag: false,
-      userInfo: null
+      isLoginFlag: false
     }
   },
   filters: {
@@ -77,7 +74,7 @@ export default {
       this.$router.push({name: item.router, query: {tab: item.tab}})
     },
     openModal (name) {
-      this.$store.commit('changeModalStates', {index: 1, name: name})
+      this.changeModalStates({index: 1, name: name})
     },
     goRecharge () {
       this.$router.push({name: 'recharge', query: {tab: 0}})
@@ -106,21 +103,6 @@ export default {
         }
       })
     },
-    getUserInfo () {
-      this.userInfo = {
-        nickname: 'aaa',
-        balance: 0,
-        avatar: 'http://localhost:8080/img/knife_1.1b78f71e.png'
-      }
-      // userInfo().then(res => {
-      //   if (res.code === 0) {
-      //     setItem('userInfo', res.data);
-      //     this.userInfo = res.data
-      //   } else {
-      //     localStorage.removeItem('user');
-      //   }
-      // });
-    }
   },
   watch: {
     $route: {
@@ -138,24 +120,12 @@ export default {
   },
   created () {
     this.routerName = this.$route.name
-    bus.$on('login', (obj) => {
-      this.isLoginFlag = obj
-      console.log(obj)
-    })
   },
   mounted() {
     this.getData()
-    this.getUserInfo()
-    this.isLoginFlag = getItem('isLoginFlag')
-    bus.$on('login', (obj) => {
-      console.log(122121)
-      this.isLoginFlag = obj
-    })
   },
   computed: {
-    ...mapGetters({
-
-    })
+    ...mapGetters(['userInfo','isLogin'])
   },
   beforeDestroy() {
 

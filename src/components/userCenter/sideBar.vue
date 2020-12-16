@@ -34,7 +34,7 @@
 
 <script>
 import { logout } from '@api/user';
-import { mapMutations, mapState } from 'vuex'
+import { mapMutations, mapGetters } from 'vuex'
 import { getItem } from '@utils/tools';
 
 export default {
@@ -48,7 +48,6 @@ export default {
         { index: 4, name: '退出登录', dir: 'logout' },
       ],
       activeIndex: 1,
-      userInfo: {},
     }
   },
   methods: {
@@ -56,14 +55,10 @@ export default {
     changeState (item) {
       this.activeIndex = item.dir
       if (item.index == 4) {
-        this.$store.commit('changeModalStates', {index: 2, subTitle: '您确定要退出登录吗?', name: 'logout', modalTitle: '提示'})
+        this.changeModalStates({index: 2, subTitle: '您确定要退出登录吗?', name: 'logout', modalTitle: '提示'})
       } else {
         this.$router.push({name: item.dir, query: {tab: item.tab}})
       }
-    },
-    getUserInfo () {
-      this.userInfo = getItem('userInfo')
-      console.log(this.userInfo)
     }
   },
   watch: {
@@ -76,10 +71,10 @@ export default {
     }
   },
   computed: {
+    ...mapGetters(['userInfo'])
   },
   created() {
     this.activeIndex = this.$route.name
-    this.getUserInfo()
   }
 };
 </script>

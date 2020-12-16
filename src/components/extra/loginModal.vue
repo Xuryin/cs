@@ -109,7 +109,6 @@ import { mobileRegisterApi, sendMobileCode, sessionLogin, sendMsmLogin, smsLogin
 import { configs } from '@/api/ajax.js';
 import { validPhone, validPassword, validIdentifyingCode, validCaptcha} from '@/utils/verify';
 import { msgAlert, setItem  } from '@/utils/tools';
-import {bus} from '@utils/bus';
 
 export default {
   name: 'modalForm',
@@ -134,12 +133,13 @@ export default {
       loginButton: false,
       lockMessage: false,
       registerButton: false,
-      loginSmsButton: false
+      loginSmsButton: false,
+      showModal: 0
     };
   },
   props: [],
   methods: {
-    ...mapMutations(['changeModalStates', 'changeLoginStatus','setUserInfo']),
+    ...mapMutations(['changeModalStates','setUserInfo']),
     login () {
       let formData = {
         username: this.mobile,
@@ -155,8 +155,6 @@ export default {
             this.getUserInfo()
             this.changeName(0, null)
             this.$Message.success('登录成功')
-            bus.$emit('login', true)
-            this.$Message.success('登录成功')
           }else {
             this.$Message.info(res.msg)
           }
@@ -169,7 +167,7 @@ export default {
       userInfo().then(res => {
         if (res.code === 0) {
           setItem('userInfo', res.data);
-          this.$store.commit('setUserInfo', res.data)
+          this.setUserInfo(res.data)
         } else {
           localStorage.removeItem('user');
         }
@@ -187,7 +185,6 @@ export default {
           if (res.code == 0) {
             this.$Message.success('登录成功')
             this.getUserInfo()
-            bus.$emit('login', true)
             this.changeName(0, null)
           } else {
             this.$Message.success(res.msg)
@@ -223,7 +220,7 @@ export default {
         captcha: this.captcha
       };
       let api = ''
-      if (this.$store.state.modalShowName == 'register') {
+      if (this.modalShowName == 'register') {
         api = sendMobileCode
       } else {
         api = sendMsmLogin
@@ -248,7 +245,7 @@ export default {
     changeName(index = 0, name = null) {
       console.log(index)
       console.log(name)
-      this.$store.commit('changeModalStates', { index: index, name: name });
+      this.changeModalStates({ index: index, name: name });
     },
     // 倒计时
     countDown() {
@@ -262,15 +259,11 @@ export default {
       }, 1000);
     },
   },
-  created() {
-  },
-  watch: {
-    modalShowName (val, oldVal) {}
-  },
   computed: {
-    ...mapState(['modalShowName']),
+    ...mapState(['modalShowName','isShowModal']),
   },
   mounted() {
+    this.showModal = this.isShowModal
   }
 };
 </script>
