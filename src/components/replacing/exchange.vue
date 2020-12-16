@@ -38,15 +38,15 @@
               <span>${{ checkedTarget.price }}</span>
             </p>
           </div>
-          <button v-if="rate <= 90 && checkedTarget.id" class="enabled-button"  @click="validConfirm">
-            <span>{{ rate | conversion }}%</span>
-            <span>确认汰换</span>
+          <button v-if="rate >= 85 && rate <= 110 && checkedTarget.id" class="enabled-button"  @click="validConfirm">
+            <span>{{ rate | formatMoney }}%</span>
+            <span>确认兑换</span>
           </button>
-          <button v-if="rate > 90 && checkedTarget.id" class="disabled-button" disabled>
-            <span>{{ rate | conversion}}%</span>
-            <span>确认汰换</span>
+          <button v-if="(rate < 85 || rate > 110 ) && checkedTarget.id" class="disabled-button" disabled>
+            <span>{{ rate | formatMoney}}%</span>
+            <span>确认兑换</span>
           </button>
-          <p style="line-height: 30px; color: red" v-if="rate > 90 && checkedTarget.id"> 汰换素材的总价值必须≤目标的90%</p>
+          <p style="line-height: 30px; color: red" v-if="(rate < 85 || rate > 110 )&& checkedTarget.id"> 兑换素材的总价值必须≤目标的85%~110%之间</p>
         </div>
       </div>
     </div>
@@ -55,7 +55,7 @@
         <div class="bottom-left-title">我的库存</div>
         <div class="bottom-left-content">
           <div class="left-content-item" v-for="item in provideData" @click="checkCurrent(item)">
-            <contentItem :itemData="item" :checkIndexData="checkedIndex" @mouseenter.native="showFictitiousTitle(item.id)" :hoverFlag="hoverFlag" typeName="provide"/>
+            <contentItem :itemData="item" :checkIndexData="checkedIndex" typeName="stock"/>
           </div>
         </div>
       </div>
@@ -63,46 +63,19 @@
         <div class="bottom-right-title">兑换库存</div>
         <div class="bottom-left-content">
           <div class="left-content-item" v-for="item in targetData" @click="checkTargetItem(item)">
-            <contentItem :itemData="item" :checkIndex="checkedID" typeName="target"/>
+            <contentItem :itemData="item" :checkIndex="checkedID" typeName="wanted"/>
           </div>
         </div>
       </div>
     </div>
-    <Modal  v-model="showModal"
-            :mask-closable="false"
-            width="360"
-            class-name="vertical-center-modal"
-            :closable="false"
-            :on-cancel="close"
-            :footer-hide="true">
-      <div class="modal-content">
-
-        <!--有背景通用头-->
-        <div class="content-title-text" slot="header">
-          <p>提示</p>
-          <div class="close-img" slot="close" @click="close()">
-            <img src="@assets/img/close.png" alt="">
-          </div>
-        </div>
-
-        <div class="input-content" >
-          <p>{{ msg }}</p>
-        </div>
-
-        <div class="content-footer" slot="footer">
-          <button class="cancel">取消</button>
-          <button @click="submitConfirm" class="confirm">确认支付</button>
-        </div>
-      </div>
-    </Modal>
   </div>
 </template>
 
 <script>
 import contentItem from './decItem'
-import { validLogin, conversion, formatMoney, fixed, getItem, setItem } from '@utils/tools';
-import { provideList, targetList, sureExchange } from '@api/trade';
-import { checkBalance, userInfo } from '@api/user';
+import { validLogin, inArray, conversion, formatMoney, fixed, getItem } from '@utils/tools';
+import { changeInventory, changeTarget, change } from '@api/trade';
+import { checkBalance } from '@api/user';
 import {mapState, mapMutations} from 'vuex'
 
 export default {
@@ -120,10 +93,9 @@ export default {
       checkedID: 0,
       routerName: 3,
       hoverFlag: 0,
+      priceDifference: 0,
 
-      // 汰换
-      totalPrice: 0, //虚拟商品总价格
-      showModal: false, //价格充足时弹窗
+      // 兑换
       msg: ''
     }
   },
@@ -157,16 +129,18 @@ export default {
       this.calcRate()
     },
     getProvideList () {
-      provideList().then( res => {
+      changeInventory().then(res => {
         if (res.code == 0) {
           this.provideData = res.data
+          console.log(res.data)
         }
       })
     },
-    getTargetList () {
-      targetList().then( res => {
+    getTargetList (price) {
+      let form = {price : price}
+      changeTarget(form).then( res => {
         if (res.code == 0) {
-          this.targetData = res.data
+          this.targetData = res.data || []
         }
       })
     },
@@ -177,7 +151,6 @@ export default {
       this.calcRate()
     },
     calcRate () {
-      console.log(this.checkedData)
       this.amount = 0
       this.checkedData.forEach(item => {
         this.amount += item.price
@@ -188,78 +161,51 @@ export default {
       } else {
         this.rate = this.amount / this.targetPrice * 100
       }
-    },
-    showFictitiousTitle (id) {
-      this.hoverFlag = id
+      // 改变右边的数组
+      console.log(this.amount)
+      this.getTargetList( this.amount )
     },
     checkBalance () {
       this.balance = getItem('userInfo').balance
       console.log(this.balance)
-     /* checkBalance().then(res => {
-        console.log(res.data)
-      })*/
+      /* checkBalance().then(res => {
+         console.log(res.data)
+       })*/
     },
     // 确认之前的验证
     validConfirm () {
-      // 如果包含虚拟商品
-      let fictitiousData = []
       let totalPrice = 0
       this.checkedData.forEach(item => {
-        if (!item.fromInventory) fictitiousData.push(item)
         totalPrice += item.price
       })
       totalPrice = fixed(totalPrice, 2)
-      if (!this.checkedData.length) {
-        // 未选择
-        this.$Message.info('您尚未选择任何素材饰品')
+      this.priceDifference = fixed((totalPrice - this.balance), 2)
+      if ( this.priceDifference > 0 ) {
+        // 缺钱
+        let msg = `您的余额不足以补差价${this.priceDifference}，请前往充值`
+        this.$store.commit('changeModalStates', { index: 2, name: 'replacingRecharge', subTitle: msg, modalTitle: '提示'});
         return false
-      } else if (fictitiousData.length) {
-        if (this.balance >= totalPrice) {
-          // 余额充足
-          this.msg = `所选汰换材料包含${fictitiousData.length}件暂未拥有的饰品， 共计$${totalPrice}，需使用余额购买后才可以进行汰换`
-          this.showModal = true
-        } else {
-          // 余额不足
-          let msg = `所选汰换材料包含${fictitiousData.length}件暂未拥有的饰品， 共计$${totalPrice}，您的余额不足，请充值后进行汰换`
-          this.$store.commit('changeModalStates', { index: 2, name: 'replacingRecharge', subTitle: msg, modalTitle: '提示'});
-          return false
-        }
-      } else {
-        this.submitConfirm()
       }
+      this.submitConfirm()
     },
     submitConfirm () {
-      this.showModal = false
       let formData = {items: [], targetId: 0}
       this.checkedData.forEach( item => {
-        formData.items.push({id: item.id, fromInventory: item.fromInventory})
+        formData.items.push(item.id)
       } )
       formData.targetId = this.checkedTarget.id
-       sureExchange(formData).then(res => {
-         if (res.code == 0) {
-           // TODO 1.刷新userinfo 2.刷新素材库
-           let msg = ''
-           res.data.isSuccess ? msg = '汰换成功' : msg = '汰换失败'
-           this.$Message.info(msg)
-           this.getUserInfo()
-         } else {
-           this.$Message.info(res.msg)
-         }
-       }).then(() => {
-         this.init()
-       })
-    },
-    close () {
-      this.showModal = false
-    },
-    getUserInfo () {
-      userInfo().then(res => {
-        if (res.code === 0) {
-          setItem('userInfo', res.data);
+      change(formData).then(res => {
+        if (res.code == 0) {
+          // TODO 1.刷新userinfo 2.刷新素材库
+          let msg = ''
+          res.data.isSuccess ? msg = '兑换成功' : msg = '兑换失败'
+          this.$Message.info(msg)
         } else {
-          localStorage.removeItem('user');
+          this.$Message.info(res.msg)
         }
-      });
+      }).then(() => {
+        this.init()
+      })
     },
     init () {
       this.getProvideList()
@@ -278,10 +224,8 @@ export default {
     if (validLogin()) {
       this.getProvideList()
     }
-    this.getTargetList()
     this.checkBalance()
     this.routerName = this.$route.name
-    console.log(this.routerName)
   }
 };
 </script>

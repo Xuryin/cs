@@ -40,6 +40,15 @@ export default {
   created () {
     this.articleID = this.$route.params.id
     console.log(this.articleID)
+  },
+  watch: {
+    $route: {
+      handler: function (val, oldVal)  {
+        console.log(val.params.id)
+        this.articleID = val.params.id
+      },
+      deep: true
+    }
   }
 };
 </script>

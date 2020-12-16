@@ -65,6 +65,13 @@ button {
     color: #E51D39;
 }
 
+.page-divide {
+    height: 46px;
+    width: 930px;
+    text-align: center;
+    line-height: 42px
+}
+
 
 /*滚动条整体样式*/
 ::-webkit-scrollbar {
@@ -103,6 +110,48 @@ button {
 .ivu-page-item-active a {
     color: #ffffff!important;
 }
+
+.ivu-message {
+    margin-top: 400px;
+}
+
+.ivu-message-notice {
+
+}
+
+.ivu-message-notice-content {
+    background-color: #1a2430!important;
+    color: #fff;
+    margin-top: 200px;
+}
+.ivu-message-notice-content i {
+    display: none;
+}
+
+
+/*input*/
+
+/* WebKit browsers */
+input::-webkit-input-placeholder {
+    color: #9CA0A7;
+    font-size: 12px;
+}
+/* Mozilla Firefox 4 to 18 */
+input:-moz-placeholder {
+    color: #9CA0A7;
+    font-size: 12px;
+}
+/* Mozilla Firefox 19+ */
+input::-moz-placeholder {
+    color: #9CA0A7;
+    font-size: 12px;
+}
+/* Internet Explorer 10+ */
+input:-ms-input-placeholder {
+    color: #9CA0A7;
+    font-size: 12px;
+}
+
 
 
 

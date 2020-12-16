@@ -10,12 +10,17 @@
     </div>
     <server/>
     <Footer class="home-footer"/>
+    <loginModal/>
+    <priceModal/>
+    <messageModal/>
+    <passwordModal/>
   </div>
 </template>
 
 <script>
 import { topScroll, Header, BoxItem, Footer } from '@/components/Home'
-import { mapMutationsm, mapState } from 'vuex';
+import { loginModal, messageModal, passwordModal, priceModal } from '@/components/extra';
+import { mapMutations, mapState } from 'vuex';
 import server from '@/components/extra/server'
 export default {
   name: 'Home',
@@ -50,7 +55,7 @@ export default {
     }
   },
   components: {
-    topScroll, Header, BoxItem, Footer, server
+    topScroll, Header, BoxItem, Footer, server,  loginModal, messageModal, passwordModal, priceModal
   },
   methods :{
 
@@ -58,6 +63,9 @@ export default {
   computed: {
   },
   mounted () {
+  },
+  created() {
+
   }
 };
 </script>

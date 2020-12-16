@@ -8,13 +8,13 @@
       </div>
 
       <div class="button-right">
-        <button>饰品兑换</button>
-        <button>饰品交易</button>
+        <button @click="$router.push({name: 'exchange'})">饰品兑换</button>
+        <button v-if="false">饰品交易</button>
       </div>
     </div>
 
     <div class="stock-info" >
-      <div class="info-left">
+      <div class="info-left" >
         <div class="left-top">
           <span>{{userInfo.amount}}件</span>
           <span>饰品交易中，合计</span>
@@ -23,7 +23,7 @@
         <p class="left-bottom">点击查看安全码</p>
       </div>
 
-      <div class="info-middle">
+      <div class="info-middle" >
         <img :src="userInfo.src" alt="">
         <span>买家昵称({{userInfo.nickName}})</span>
       </div>
@@ -43,7 +43,7 @@
 
     </div>
 
-    <div class="info-verify" v-if="isExtend">
+    <div class="info-verify" v-if="isExtend" >
       <p>
         <img src="" alt="">
         <span>买家昵称({{userInfo.nickName}})</span>
@@ -392,11 +392,8 @@ export default {
         font-size 12px
         line-height 14px
 .page-divide
-   height 46px
-   width 836px
    text-align right
-   position fixed
-   bottom 15px
+   position absolute
+   bottom 95px
    right 36px
-   line-height 42px
 </style>

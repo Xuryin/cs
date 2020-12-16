@@ -2,30 +2,30 @@
   <div class="box-item">
 
     <div class="box-item-title">
-      <img :src="boxData.bgUrl" alt="">
-      <p>{{boxData.title}}</p>
+      <img :src="bgUrl.url" alt="">
+      <p>{{boxData.groupName}}</p>
     </div>
-    <div class="box-show">
-      <div v-for="item in boxData.content" class="show-item">
+    <div class="box-show" ref="content">
+      <div v-for="item in boxData.cases.slice(0, 5)" class="show-item" @click="routerTo(item)">
         <a href="#">
           <div class="box-face">
             <div class="face-box">
-              <img :src="item.url" />
+              <img :src="configs.imgbaseURL + item.frontPic" />
             </div>
            <div class="face-main">
-             <img :src="item.content" />
+             <img :src="configs.imgbaseURL + item.casePic" />
            </div>
 
           </div>
 
-          <p class="box-name">{{item.name}}</p>
+          <p class="box-name">{{item.caseName}}</p>
 
-          <div class="show-operation">
+          <div class="show-operation" ref="box">
             <div class="show-price position-abs">
               <img src="@assets/img/btn_dakai_normal.png" alt="">
-              <p>${{item.price}}</p>
+              <p>${{item.casePrice}}</p>
             </div>
-            <div class="show-open position-abs">
+            <div class="show-open position-abs" >
               <img src="@assets/img/btn_dakai_hover.png" alt="">
               <p>打开</p>
             </div>
@@ -38,17 +38,25 @@
 </template>
 
 <script>
+import { configs } from '@api/ajax';
+
 export default {
   name: "BoxItem",
   data () {
     return {
     }
   },
-  props: ['boxData'],
+  props: ['boxData', 'bgUrl'],
   methods: {
+    routerTo (item) {
+      console.log(item)
+      this.$router.push({name: 'boxDetail', query: {id: item.caseId}})
+    },
+  },
+  created() {
+    this.configs = configs
   },
   mounted () {
-    console.log(this.boxData)
   }
 }
 </script>
@@ -94,11 +102,13 @@ export default {
             height 136px
 
         .face-main
+          transition aii 0.5s ease-in-out
           text-align center
           position absolute
           left 27px
           top 12px
           img
+            transition transform 0.5s ease-in-out
             width 146px
             height 71px
       .box-name
@@ -106,29 +116,26 @@ export default {
         font-size 14px
         text-align center
         line-height 30px
+        transition all 0.5s ease-in-out
 
       .show-operation
         position relative
         transition all 0.5s ease-in-out
         .show-price
           z-index 11
+          transition all 0.5s ease-in-out
           p
             color #FFDD21
         .show-open
           z-index 9
+          transition all 0.5s ease-in-out
           p
             color #fff
+            transform rotateY(-180deg)
 
-        .position-abs
-          position absolute
-          left 70px
-          margin-top 5px
-          p
-            position absolute
-            left 35px
-            top 5px
 
 a:hover {
+  transition all 0.5s ease-in-out
   .box-face {
     background url(../../assets/img/box-bg.png) no-repeat 0 58px
     background-size 238px 81px
@@ -138,13 +145,33 @@ a:hover {
     .show-price {
       visibility hidden
       opacity 0
+      transform rotateY(180deg)
+      transition all 0.5s ease-in-out
     }
     .show-open {
       visibility visible
       opacity 1
+      transform rotateY(-180deg)
+      transition all 0.5s ease-in-out
+      p {
+        transform rotateY(-180deg)
+      }
     }
   }
+  .face-main img{
+    transform rotateZ(-5deg) translateY(-15px)
+    transform-origin: 50px 50px;
+    transition transform 0.5s ease-in-out
+  }
 }
+.position-abs
+  position absolute
+  left 70px
+  margin-top 5px
+  p
+    position absolute
+    left 30px
+    top 5px
 
 
 </style>

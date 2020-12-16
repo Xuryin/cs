@@ -14,15 +14,18 @@ module.exports = {
       .set('@utils', path.join(__dirname, './src/utils'));
   },
   configureWebpack: {
-    plugins: [
-      new webpack.ProvidePlugin({
-        $: 'jquery',
-        jQuery: 'jquery',
-        'windows.jQuery': 'jquery'
-      })
-    ]
+    plugins: []
   },
   lintOnSave: true,
+  devServer: {
+    open: process.platform === 'darwin',
+    host: 'localhost',
+    port: 8080,
+    https: false,
+    hotOnly: false,
+    proxy: null, // 设置代理
+    before: app => {}
+  },
   css: {
     loaderOptions: {
       postcss: {

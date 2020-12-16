@@ -146,11 +146,8 @@ export default {
           margin-left 20px
 
 .page-divide
-  height 46px
-  width 836px
   text-align right
   position fixed
-  bottom 15px
+  bottom 95px
   right 36px
-  line-height 42px
 </style>

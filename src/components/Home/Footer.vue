@@ -7,17 +7,17 @@
       </div>
 
       <div class="right-content">
-        <p>
+        <p @click="routerTo(0)">
           <img src="@assets/img/icon_steam1.png" alt="">
           <span>Steam登录教程</span>
         </p>
 
-        <p>
+        <p @click="routerTo(2)">
           <img src="@assets/img/icon_quhui1.png" alt="">
           <span>如何取回</span>
         </p>
 
-        <p>
+        <p >
           <img src="@assets/img/icon_lianxi1.png" alt="">
           <span>联系我们</span>
         </p>
@@ -35,8 +35,12 @@ export default {
     }
   },
   methods: {
+    routerTo (id) {
+      this.$router.push({name:"helper", params: {id: id}})
+    }
+  },
 
-  }
+
 };
 </script>
 
@@ -73,6 +77,7 @@ export default {
         display flex
         justify-content flex-end
         align-items center
+        cursor help
         img
           margin-right 15px
         span

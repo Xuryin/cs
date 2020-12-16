@@ -1,7 +1,7 @@
 <template>
   <div class="home">
-    <div v-for="item in boxData" >
-      <BoxItem :boxData="item"/>
+    <div v-for="(item, index) in boxData" >
+      <BoxItem :boxData="item" :bgUrl="bgUrl[index]"/>
     </div>
   </div>
 </template>
@@ -9,52 +9,21 @@
 <script>
 import { BoxItem } from '@/components/Home'
 import { mapMutationsm, mapState } from 'vuex';
+import { boxList } from '@api/trade';
 export default {
   name: 'Home',
   data () {
     return {
-      boxData: [
-        { title: '福利宝箱',
-          bgUrl: require('@assets/img/img_fulibox.png'),
-          content: [
-            {id: 1,url: require('@assets/img/box_1.png'), content: require('@assets/img/gun_1.png'), name: '箱子名称', price: 10},
-            {id: 2,url: require('@assets/img/box_2.png'), content: require('@assets/img/gun_2.png'), name: '箱子名称', price: 10},
-            {id: 3,url: require('@assets/img/box_3.png'), content: require('@assets/img/knife_1.png'), name: '箱子名称', price: 10},
-            {id: 3,url: require('@assets/img/box_3.png'), content: require('@assets/img/knife_1.png'), name: '箱子名称', price: 10},
-            {id: 3,url: require('@assets/img/box_3.png'), content: require('@assets/img/knife_1.png'), name: '箱子名称', price: 10},
-          ] },
-        { title: '第一类宝箱',
-          bgUrl: require('@assets/img/img_ptbox.png'),
-          content: [
-            {id: 1,url: require('@assets/img/box_1.png'), content: require('@assets/img/gun_1.png'), name: '箱子名称', price: 10},
-            {id: 2,url: require('@assets/img/box_2.png'), content: require('@assets/img/gun_2.png'), name: '箱子名称', price: 10},
-            {id: 3,url: require('@assets/img/box_3.png'), content: require('@assets/img/knife_1.png'), name: '箱子名称', price: 10},
-          ] },
-        { title: '第二类宝箱',
-          bgUrl: require('@assets/img/img_ptbox.png'),
-          content: [
-            {id: 1,url: require('@assets/img/box_1.png'), content: require('@assets/img/gun_1.png'), name: '箱子名称', price: 10},
-            {id: 2,url: require('@assets/img/box_2.png'), content: require('@assets/img/gun_2.png'), name: '箱子名称', price: 10},
-            {id: 3,url: require('@assets/img/box_3.png'), content: require('@assets/img/knife_1.png'), name: '箱子名称', price: 10},
-          ] },
-        { title: '福利宝箱',
-          bgUrl: require('@assets/img/img_fulibox.png'),
-          content: [
-            {id: 1,url: require('@assets/img/box_1.png'), content: require('@assets/img/gun_1.png'), name: '箱子名称', price: 10},
-            {id: 2,url: require('@assets/img/box_2.png'), content: require('@assets/img/gun_2.png'), name: '箱子名称', price: 10},
-            {id: 3,url: require('@assets/img/box_3.png'), content: require('@assets/img/knife_1.png'), name: '箱子名称', price: 10},
-            {id: 3,url: require('@assets/img/box_3.png'), content: require('@assets/img/knife_1.png'), name: '箱子名称', price: 10},
-            {id: 3,url: require('@assets/img/box_3.png'), content: require('@assets/img/knife_1.png'), name: '箱子名称', price: 10},
-          ] },
-        { title: '福利宝箱',
-          bgUrl: require('@assets/img/img_fulibox.png'),
-          content: [
-            {id: 1,url: require('@assets/img/box_1.png'), content: require('@assets/img/gun_1.png'), name: '箱子名称', price: 10},
-            {id: 2,url: require('@assets/img/box_2.png'), content: require('@assets/img/gun_2.png'), name: '箱子名称', price: 10},
-            {id: 3,url: require('@assets/img/box_3.png'), content: require('@assets/img/knife_1.png'), name: '箱子名称', price: 10},
-            {id: 3,url: require('@assets/img/box_3.png'), content: require('@assets/img/knife_1.png'), name: '箱子名称', price: 10},
-            {id: 3,url: require('@assets/img/box_3.png'), content: require('@assets/img/knife_1.png'), name: '箱子名称', price: 10},
-          ] },
+      boxData: [],
+      bgUrl: [
+        {id: 1, url: require('../assets/img/img_fulibox.png')},
+        {id: 1, url: require('../assets/img/img_ptbox.png')},
+        {id: 1, url: require('../assets/img/img_ptbox.png')},
+        {id: 1, url: require('../assets/img/img_ptbox.png')},
+        {id: 1, url: require('../assets/img/img_ptbox.png')},
+        {id: 1, url: require('../assets/img/img_ptbox.png')},
+        {id: 1, url: require('../assets/img/img_ptbox.png')},
+        {id: 1, url: require('../assets/img/img_ptbox.png')}
       ]
     }
   },
@@ -62,11 +31,20 @@ export default {
     BoxItem
   },
   methods :{
-
+    getCaseList () {
+      boxList().then(res => {
+        if (res.code == 0) {
+          this.boxData = res.data
+        } else {
+          this.$Message('res.msg')
+        }
+      })
+    }
   },
   computed: {
   },
   mounted () {
+    this.getCaseList()
   }
 };
 </script>

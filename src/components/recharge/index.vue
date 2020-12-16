@@ -9,25 +9,36 @@
 
   </div>
 </template>
-
 <script>
 import balance from './balance';
 import recharge from './recharge';
+import { getItem } from '@utils/tools';
+import { userTradeUrl, userInfo  } from '@api/user';
+import { mapMutations, mapState } from 'vuex'
 export default {
   name: 'index',
   data () {
     return {
       routerIndex: 0,
-      navData:  [ {id: 0, name: '充值'}, {id: 1, name: '余额明细'} ],
+      navData:  [ {id: 0, name: '充值'}, {id: 1, name: '余额明细'} ]
     }
   },
   methods: {
+
     changeRouter (index) {
-      console.log(index)
-      this.routerIndex = index
-    }
+      this.$router.push({name: 'recharge', query: {tab: index}})
+    },
+
   },
-  components: { balance, recharge }
+  components: { balance, recharge },
+  mounted() {
+    this.routerIndex = this.$route.query.tab
+  },
+  watch: {
+    $route (val, oldVal) {
+      this.routerIndex = val.query.tab
+    }
+  }
 };
 </script>
 

@@ -7,14 +7,14 @@
         <span>官方Q群</span>
       </p>
     </div>
-    <div class="radius-father" @mouseover="checked(2)" :class="active == 2 ? 'active': ''" @mouseleave="unChecked" @click="operate(1)">
+    <div class="radius-father" @mouseover="checked(2)" :class="active == 2 ? 'active': ''" @mouseleave="unChecked" @click="operate(2)">
       <p>
         <img src="@assets/img/icon_kefu_hover.png" alt="" v-if="active == 2" >
         <img src="@assets/img/icon_kefu_normal.png" alt="" v-if="active != 2">
         <span>联系客服</span>
       </p>
     </div>
-    <div class="radius-father" @mouseover="checked(3)" :class="active == 3 ? 'active': ''" @mouseleave="unChecked" @click="operate(1)">
+    <div class="radius-father" @mouseover="checked(3)" :class="active == 3 ? 'active': ''" @mouseleave="unChecked" @click="operate(3)">
       <p>
         <img src="@assets/img/icon_bangzhu_hover.png" alt="" v-if="active == 3" >
         <img src="@assets/img/icon_bangzhu_normal.png" alt="" v-if="active != 3">
@@ -22,7 +22,7 @@
       </p>
     </div>
 
-    <div class="radius-father" @mouseover="checked(4)"  :class="active == 4 ? 'active': ''" @mouseleave="unChecked" @click="operate(1)">
+    <div class="radius-father" @mouseover="checked(4)"  :class="active == 4 ? 'active': ''" @mouseleave="unChecked" @click="operate(4)">
       <p>
         <img src="@assets/img/icon_huiding_hover.png" alt="" v-if="active == 4" >
         <img src="@assets/img/icon_huiding_noraml.png" alt="" v-if="active != 4">
@@ -50,6 +50,7 @@ export default {
       this.active = 0
     },
     operate (id) {
+      console.log(id)
       if (id == 1) {
         return false
       } else if (id == 2) {
@@ -67,8 +68,9 @@ export default {
 <style scoped lang="stylus">
 .service-block
   position fixed
-  right 271px
+  right 10%
   top 568px
+  z-index 110
 
   .radius-father
     width: 60px;

@@ -10,98 +10,68 @@
       <ul class="details-list">
         <li v-for="item in detailsData">
           <div class="list-img">
-            <img :src="item.url" alt="">
-            <span>{{item.name}}</span>
+            <img :src="item.awardPicture" alt="">
+            <span>{{item.awardName}}</span>
           </div>
-          <span>{{item.origin}}</span>
-          <span>{{item.date}}</span>
+          <span>{{item.caseName}}</span>
+          <span>{{item.timeCreate}}</span>
         </li>
       </ul>
     </div>
 
     <div class="page-divide">
-      <Page :total="detailsData.length" :page-size="10"></Page>
+      <Page v-model="pageInfo.current" :total="pageInfo.total" :page-size="pageInfo.size" @on-change="changePage"></Page>
     </div>
 
   </div>
 </template>
 
 <script>
+import { inventory } from '@api/trade';
+import { typeRate } from '@utils/tools';
+import {mapState, mapMutations} from 'vuex'
 
 export default {
   name: 'stockDetails',
   data () {
     return {
-      detailsData: [
-        {
-          date: '2020年12月30日 12:39:45',
-          name: '海豹短刀（★）屠夫',
-          url: require('../../assets/img/knife_1.png'),
-          origin: '兑换商城'
-        },
-        {
-          date: '2020年12月30日 12:39:45',
-          name: '海豹短刀（★）屠夫',
-          url: require('../../assets/img/knife_1.png'),
-          origin: '兑换商城'
-        },
-        {
-          date: '2020年12月30日 12:39:45',
-          name: '海豹短刀（★）屠夫',
-          url: require('../../assets/img/knife_1.png'),
-          origin: '兑换商城'
-        },
-        {
-          date: '2020年12月30日 12:39:45',
-          name: '海豹短刀（★）屠夫',
-          url: require('../../assets/img/knife_1.png'),
-          origin: 'XX箱子'
-        },
-        {
-          date: '2020年12月30日 12:39:45',
-          name: '海豹短刀（★）屠夫',
-          url: require('../../assets/img/knife_1.png'),
-          origin: '兑换商城'
-        },
-        {
-          date: '2020年12月30日 12:39:45',
-          name: '海豹短刀（★）屠夫',
-          url: require('../../assets/img/knife_1.png'),
-          origin: '兑换商城'
-        },
-        {
-          date: '2020年12月30日 12:39:45',
-          name: '海豹短刀（★）屠夫',
-          url: require('../../assets/img/knife_1.png'),
-          origin: '兑换商城'
-        },
-        {
-          date: '2020年12月30日 12:39:45',
-          name: '海豹短刀（★）屠夫',
-          url: require('../../assets/img/knife_1.png'),
-          origin: '兑换商城'
-        },
-        {
-          date: '2020年12月30日 12:39:45',
-          name: '海豹短刀（★）屠夫',
-          url: require('../../assets/img/knife_1.png'),
-          origin: '兑换商城'
-        },
-        {
-          date: '2020年12月30日 12:39:45',
-          name: '海豹短刀（★）屠夫',
-          url: require('../../assets/img/knife_1.png'),
-          origin: '兑换商城'
-        },
-      ],
-      mini: 'mini'
+      detailsData: [],
+      pageInfo: {
+        total: 0,
+        current:1,
+        size:10
+      }
     }
   },
   methods: {
-
+    ...mapMutations,
+    getInventory() {
+      let params = this.pageInfo
+      params.type = 'available'
+      console.log(params)
+      inventory(params).then(res => {
+        if (res.code === 0) {
+          this.detailsData = res.data.data
+          this.pageInfo = {
+            total: res.data.totalItems,
+            current: res.data.pageNumber,
+            size: res.data.pageSize
+          }
+        } else {
+          this.$Message.info(res.msg)
+        }
+      });
+    },
+    changePage (e) {
+      this.pageInfo.current = e
+      this.getInventory()
+    }
   },
   components: {
 
+  },
+  mounted () {
+    this.getInventory()
   }
 };
 </script>
@@ -126,9 +96,9 @@ export default {
       text-align center
       color #fff
       &:nth-child(1)
-        width 300px
+        width 500px
       &:nth-child(2)
-        width 400px
+        width 200px
       &:nth-child(3)
         width 260px
 
@@ -143,12 +113,12 @@ export default {
         color #fff
         text-align center
       >:nth-child(2)
-        width 400px
+        width 200px
       >:nth-child(3)
         width 260px
       .list-img
         height 100%
-        width 300px
+        width 500px
         line-height 60px
         text-align center
         display flex
@@ -166,13 +136,10 @@ export default {
     li:nth-child(2n-1)
       background-color transparent
   .page-divide
-    height 46px
-    width 836px
     text-align right
     position fixed
-    bottom 15px
+    bottom 95px
     right 36px
-    line-height 42px
 .fontRed
   color #E51D39!important
 .fontGreen

@@ -3,8 +3,8 @@
     <sideBar/>
     <div class="user-content">
       <div class="user-input">
-        <input type="text" placeholder="请输入你的报价链接">
-        <button>保存</button>
+        <input type="text" placeholder="请输入你的报价链接" v-model="userTransactionURL">
+        <button @click="saveLink"  :disabled="saveButton">保存</button>
       </div>
       <p>
         <img src="@assets/img/warning-icon.png" alt="">
@@ -21,18 +21,40 @@
 </template>
 
 <script>
-import { getArrItem } from '@utils/tools.js'
+import { getArrItem, getItem } from '@utils/tools.js';
 import { sideBar } from '@/components/userCenter'
 import { mapMutations } from 'vuex'
+import { userTradeUrl } from '@api/user';
 export default {
   name: 'userCenter',
   data () {
     return {
-
+      saveButton: false,
+      userTransactionURL: ''
     }
   },
   methods: {
-
+    ...mapMutations(['getUserInfo']),
+    // 保存
+    saveLink () {
+      console.log( this.userTransactionURL )
+      if (!/^https:\/\/steamcommunity\.com\/tradeoffer\/new\/?\?partner=\d+&token=.+$/.test(this.userTransactionURL)) {
+        this.$Message.info("请填写正确的Url地址！");
+        this.userTransactionURL = ""
+      } else {
+        userTradeUrl({ tradeUrl: this.userTransactionURL}).then(res => {
+          this.saveButton = true
+          if (res.data.code === 0) {
+            this.getUserInfo()
+            this.$Message.info("修改成功");
+          } else {
+            this.$Message.info(res.msg);
+          }
+        }).then(() => {
+          this.saveButton = false
+        })
+      }
+    }
   },
   components: {
     sideBar

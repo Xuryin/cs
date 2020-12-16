@@ -3,9 +3,9 @@
     <div class="recharge-mount">
       <p>充值金额</p>
       <div class="mount-item">
-        <span v-for="dollar in mountData"  :class="isChecked == dollar.id ? 'active' : ''" @click="checkMount(dollar.id)" >
-          ${{dollar.mount}}
-          <span class="extra-icon" v-if="dollar.extra">+3%</span>
+        <span v-for="(item, key) in amountData"  :class="isChecked == key ? 'active' : ''" @click="checkMount(key)" >
+          ${{item | formatMoney}}
+          <span class="extra-icon" v-if="false">+3%</span>
         </span>
       </div>
 
@@ -13,18 +13,18 @@
 
     <div class="arrive-mount">
       <p>到账金额</p>
-      <p>${{arriveMount}}</p>
+      <p>$ {{arriveMount | formatMoney}}</p>
     </div>
 
     <div class="realPay-mount">
       <p>实付金额</p>
-      <p>${{pay}}</p>
+      <p>￥{{pay | formatMoney}}</p>
     </div>
 
     <div class="pay-methods">
       <p>支付方式</p>
       <div class="methods-items">
-        <div v-for="item in payMethods" :class="methodsIndex == item.id ? 'methodsActive': ''" @click="methodsIndex= item.id" class="item-pay">
+        <div v-for="item in payMethods" :class="methodsIndex == item.id ? 'methodsActive': ''" @click="changeMethods(item.id)" class="item-pay">
           <img :src="item.url" alt="">
           <span>{{item.name}}</span>
         </div>
@@ -33,7 +33,7 @@
 
     <div class="confirm-pay">
       <p></p>
-      <button>确认支付</button>
+      <button @click="confirm" :disabled="confirmButton">确认支付</button>
     </div>
 
 
@@ -41,31 +41,92 @@
 </template>
 
 <script>
+import { payTypeGet, rechargeQr, checkOrder } from '@api/user';
+import { getArrItem, formatMoney } from '@utils/tools';
+import { mapMutations } from 'vuex'
 
 export default {
   name: 'recharge',
-
   data () {
     return {
-      mountData: [
-        {id: 0, mount: 5, extra: false},
-        {id: 1, mount: 10, extra: false},
-        {id: 2, mount: 20, extra: true},
-        {id: 3, mount: 50, extra: false},
-        {id: 4, mount: 100, extra: false},
-      ],
-      arriveMount: '20.6',
-      pay: '20.6',
-      payMethods: [{url:require('../../assets/img/WeChat.png') , name: '微信支付', id: 0}, {url:require( '../../assets/img/aliPay.png'), name: '支付宝支付', id: 1}],
+      amountData: [],
+      arriveMount: 0,
+      pay: 0,
+      payMethods: [{url:require('../../assets/img/WeChat.png') , name: '微信支付', id: 1}, {url:require( '../../assets/img/aliPay.png'), name: '支付宝支付', id: 0}],
       isChecked: 0,
-      methodsIndex: 0
+      methodsIndex: 0,
+      configData: [],
+      confirmButton: false,
+      orderNumber: 0,
+      checkInterVal: null
     }
+  },
+  filters: {
+    formatMoney
   },
   methods: {
     checkMount (index) {
       this.isChecked = index
+      this.arriveMount = this.amountData[index]
+      this.pay = this.amountData[index] * 7
+    },
+    changeMethods (id) {
+      this.methodsIndex= id
+      let obj = getArrItem(this.configData, 'key', id)
+      this.amountData = obj.amountList
+      this.checkMount(0)
+    },
+    payConfigs () {
+      payTypeGet().then(res => {
+        console.log(res.data.rechargeInfo)
+        this.configData = res.data.rechargeInfo
+      }).then(() => {
+        this.changeMethods(1)
+      })
+    },
+    confirm () {
+      if (this.pay == 0) {
+        this.$Message.info('充值金额不能为0')
+      } else {
+        let tradeType, type
+        this.methodsIndex == 0 ? tradeType = 'pay_alipay_code' : tradeType = 'pay_wxpay_code'
+        this.methodsIndex == 0 ? type = '支付宝' : type = '微信'
+        let formData = {
+          amount: this.arriveMount,
+          tradeType: tradeType
+        }
+        // let qrcode = 'https://interface.e8pay.com/api/QrCode/9D1E5622DA317DE83544D47E37571EA9'
+        rechargeQr(formData).then(res => {
+          if (res.code == 0) {
+            let qrcode = res.data.qr
+            this.orderNumber = res.data.orderNo
+            this.$store.commit('changeModalStates', {index: 2, name: 'recharge', qrCode: qrcode, payAmount: this.arriveMount, subTitle: `${type}扫码支付`})
+            this.checkInterVal = setInterval(this.checkPayResult, 5000)
+          } else {
+            this.$Message.info(res.msg)
+          }
+        })
+
+      }
+    },
+    checkPayResult () {
+      checkOrder(this.orderNumber).then(res => {
+        console.log(res)
+        if (res.code == 0) {
+          this.$store.commit('changeModalStates', {index: 0})
+          clearInterval(this.checkInterVal)
+          this.userInfo()
+        }
+      })
     }
   },
+  mounted () {
+    this.payConfigs()
+
+  },
+  computed: {
+    ...mapMutations(['changeModalStates', 'getUserInfo'])
+  }
 
 };
 </script>

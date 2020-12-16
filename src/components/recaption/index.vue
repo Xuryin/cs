@@ -4,8 +4,8 @@
       <p v-for="item in navData" :class="routerIndex == item.id? 'active': ''" @click="changeRouter(item.id)">
         {{ item.name }}</p>
     </div>
-    <donata v-if="routerIndex == 0"/>
-    <stock v-if="routerIndex == 1"/>
+    <donata v-if="routerIndex == 1"/>
+    <stock v-if="routerIndex == 0"/>
     <stockDetails v-if="routerIndex == 2"/>
   </div>
 </template>
@@ -19,16 +19,24 @@ export default {
   data () {
     return {
       routerIndex: 0,
-      navData:  [ {id: 0, name: '饰品库存'}, {id: 1, name: '饰品赠送'}, {id: 2, name: '库存记录'} ],
+      navData:  [ {id: 0, name: '饰品库存'},{id: 2, name: '库存记录'} ],
     }
   },
   methods: {
     changeRouter (index) {
-      console.log(index)
-      this.routerIndex = index
+      this.$router.push({name: 'recaption', query: {tab: index}})
     }
   },
-  components: { donata, stock, stockDetails }
+  components: { donata, stock, stockDetails },
+  mounted() {
+    console.log(this.$route.params)
+    this.routerIndex = this.$route.query.tab
+  },
+  watch: {
+    $route (val, oldVal) {
+      this.routerIndex = val.query.tab
+    }
+  }
 };
 </script>
 

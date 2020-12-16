@@ -10,26 +10,27 @@
 
       <ul class="details-list">
         <li v-for="item in detailsData">
-          <span>{{item.date}}</span>
-          <span>{{item.operation}}</span>
-          <span :class="Number(item.amount) < 0 ? 'fontRed': 'fontGreen'">
-            <i v-if="Number(item.amount) >= 0">+</i>
-            <i v-if="Number(item.amount) < 0">-</i>
-            ${{item.amount}}</span>
-          <span>${{item.after}}</span>
+          <span>{{item.timeCreate}}</span>
+          <span>{{item.reason}}</span>
+          <span :class="Number(item.amountChanged) < 0 ? 'fontRed': 'fontGreen'">
+            <i v-if="Number(item.amountChanged) >= 0">+</i>
+            <i v-if="Number(item.amountChanged) < 0">-</i>
+            ${{item.amountChanged|conversion}}</span>
+          <span>${{item.amountRecord|conversion}}</span>
         </li>
       </ul>
     </div>
 
     <div class="page-divide">
-      <Page :total="detailsData.length" :page-size="10"></Page>
+      <Page v-model="pageInfo.current" :total="pageInfo.total" :page-size="pageInfo.size" @on-change="changePage"></Page>
     </div>
 
   </div>
 </template>
 
 <script>
-
+import { userBalance } from '@/api/user'
+import {conversion} from '@utils/tools'
 export default {
   name: 'balance',
   components: {
@@ -37,83 +38,40 @@ export default {
   },
   data () {
     return {
-      detailsData: [
-        {
-          date: '2020年12月30日 12:39:45',
-          operation: '签到奖励',
-          amount: '100',
-          after: '100'
-        },
-        {
-          date: '2020年12月30日 12:39:45',
-          operation: '充值',
-          amount: '100',
-          after: '100'
-        },
-        {
-          date: '2020年12月30日 12:39:45',
-          operation: 'XX宝箱',
-          amount: '-100',
-          after: '100'
-        }, {
-          date: '2020年12月30日 12:39:45',
-          operation: '签到奖励',
-          amount: '100',
-          after: '100'
-        },
-        {
-          date: '2020年12月30日 12:39:45',
-          operation: '充值',
-          amount: '100',
-          after: '100'
-        },
-        {
-          date: '2020年12月30日 12:39:45',
-          operation: 'XX宝箱',
-          amount: '-100',
-          after: '100'
-        }, {
-          date: '2020年12月30日 12:39:45',
-          operation: '签到奖励',
-          amount: '100',
-          after: '100'
-        },
-        {
-          date: '2020年12月30日 12:39:45',
-          operation: '充值',
-          amount: '100',
-          after: '100'
-        },
-        {
-          date: '2020年12月30日 12:39:45',
-          operation: 'XX宝箱',
-          amount: '-100',
-          after: '100'
-        }, {
-          date: '2020年12月30日 12:39:45',
-          operation: '签到奖励',
-          amount: '100',
-          after: '100'
-        },
-        {
-          date: '2020年12月30日 12:39:45',
-          operation: '充值',
-          amount: '100',
-          after: '100'
-        },
-        {
-          date: '2020年12月30日 12:39:45',
-          operation: 'XX宝箱',
-          amount: '-100',
-          after: '100'
-        },
-      ],
-      mini: 'mini'
+      detailsData: [],
+      mini: 'mini',
+      pageInfo:{
+        total: 0,
+        current:1,
+        size:10
+      }
     }
   },
   methods: {
-
-  }
+    getUserBalance() {
+      let params = this.pageInfo
+      userBalance(params).then(res => {
+        if (res.code === 0) {
+          this.detailsData = res.data.data
+          this.pageInfo = {
+            total: res.data.totalItems,
+            current: res.data.pageNumber,
+            size: res.data.pageSize
+          }
+        }
+      });
+    },
+    changePage (e) {
+      this.pageInfo.current = e
+      this.getUserBalance()
+    }
+  },
+  created () {
+    this.getUserBalance()
+  },
+  filters: {
+    conversion
+  },
 };
 </script>
 
@@ -155,11 +113,9 @@ export default {
     li:nth-child(2n-1)
       background-color transparent
   .page-divide
-    height 46px
-    width 930px
     text-align center
-    position fixed
-    bottom 15px
+    position absolute
+    bottom 75px
     line-height 42px
 .fontRed
   color #E51D39!important

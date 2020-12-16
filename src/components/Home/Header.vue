@@ -13,11 +13,18 @@
         </div>
       </div>
 
-      <div class="header-login">
-        <p>登录</p>
-        <p>注册</p>
+      <div class="header-login" v-if="!isLoginFlag">
+        <p @click="openModal('password')">登录</p>
+        <p @click="openModal('register')">注册</p>
       </div>
 
+      <div class="header-info" v-if="isLoginFlag" @click="goRecharge">
+        <div>
+          <img :src="userInfo.avatarFull" alt="">
+        </div>
+        <p>{{userInfo.nickname}}</p>
+        <p>$ {{userInfo.balance | formatMoney}}</p>
+      </div>
     </div>
 
     <div class="header-bottom">
@@ -33,28 +40,86 @@
 </template>
 
 <script>
+import { mapState, mapMutations, mapGetters } from 'vuex'
+import { getItem, setItem, formatMoney } from '@utils/tools';
+import { userInfo } from '@api/user';
+import { indexHistory } from '@api/trade';
+import {bus} from '@utils/bus';
+
 export default {
   name: 'Header',
   data () {
     return {
       routerName: '',
+      isShowHeader: false,
       navData: [
         {src: require('@assets/img/icon_baobox.png') , name: 'CSGO宝箱', isActive: true, router: 'Home'},
         {src: require('@assets/img/icon_taihuan.png') , name: '饰品汰换', isActive: false, router: 'replacing'},
-        {src: require('@assets/img/icon_kucun.png') , name: '我的库存' , isActive: false, router: 'recaption'},
-        {src: require('@assets/img/icon_chongzhi.png') , name: '在线充值', isActive: false, router: 'recharge'},
+        {src: require('@assets/img/icon_kucun.png') , name: '我的库存' , isActive: false, router: 'recaption' , tab: '0'},
+        {src: require('@assets/img/icon_chongzhi.png') , name: '在线充值', isActive: false, router: 'recharge', tab: '0'},
       ],
       bottomData: [
-        {src: require('@assets/img/icon_zaixian.png') , number: 101, per: '在线', color: '#7CE539'},
-        {src: require('@assets/img/icon_zhuce.png') , number: 25668, per: '注册',  color: '#FFB321'},
-        {src: require('@assets/img/icon_yikaixiang.png') , number: 501111, per: '开箱',  color: '#0066FF'},
-        {src: require('@assets/img/icon_yiquhui.png') , number: 456888, per: '已取回',  color: '#B716F3'},
-      ]
+        {src: require('@assets/img/icon_zaixian.png') , number: 0, per: '在线', color: '#7CE539'},
+        {src: require('@assets/img/icon_zhuce.png') , number: 1, per: '注册',  color: '#FFB321'},
+        {src: require('@assets/img/icon_yikaixiang.png') , number: 2, per: '开箱',  color: '#0066FF'},
+        {src: require('@assets/img/icon_yiquhui.png') , number: 3, per: '已取回',  color: '#B716F3'},
+      ],
+      isLoginFlag: false,
+      userInfo: null
     }
   },
+  filters: {
+    formatMoney
+  },
   methods: {
+    ...mapMutations(['changeModalStates']),
     routerTo (item) {
-      this.$router.push({name: item.router})
+      this.$router.push({name: item.router, query: {tab: item.tab}})
+    },
+    openModal (name) {
+      this.$store.commit('changeModalStates', {index: 1, name: name})
+    },
+    goRecharge () {
+      this.$router.push({name: 'recharge', query: {tab: 0}})
+    },
+    getData() {
+      indexHistory().then(res => {
+        if (res.code == 0) {
+          this.bottomData.forEach(item => {
+            switch (item.number) {
+              case 0:
+                item.number = res.data.onlineUser
+                break;
+              case 1:
+                item.number = res.data.redeemed_count
+                break;
+              case 2:
+                item.number = res.data.total
+                break;
+              case 3:
+                item.number = res.data.user_count
+                break;
+            }
+          })
+        } else {
+          this.$Message('获取信息失败')
+        }
+      })
+    },
+    getUserInfo () {
+      this.userInfo = {
+        nickname: 'aaa',
+        balance: 0,
+        avatar: 'http://localhost:8080/img/knife_1.1b78f71e.png'
+      }
+      // userInfo().then(res => {
+      //   if (res.code === 0) {
+      //     setItem('userInfo', res.data);
+      //     this.userInfo = res.data
+      //   } else {
+      //     localStorage.removeItem('user');
+      //   }
+      // });
     }
   },
   watch: {
@@ -64,12 +129,37 @@ export default {
         this.routerName = val.name
       },
       deep: true
+    },
+    isLoginFlag: {
+      handler: (val, oldVal) => {
+        setItem('loginFlag', val)
+      }
     }
   },
   created () {
     this.routerName = this.$route.name
-  }
+    bus.$on('login', (obj) => {
+      this.isLoginFlag = obj
+      console.log(obj)
+    })
+  },
+  mounted() {
+    this.getData()
+    this.getUserInfo()
+    this.isLoginFlag = getItem('isLoginFlag')
+    bus.$on('login', (obj) => {
+      console.log(122121)
+      this.isLoginFlag = obj
+    })
+  },
+  computed: {
+    ...mapGetters({
 
+    })
+  },
+  beforeDestroy() {
+
+  }
 };
 </script>
 
@@ -100,6 +190,7 @@ export default {
         flex-direction column
         height 96px
         width 135px
+        cursor pointer
         .nav-img
           width 50px
           height 50px
@@ -120,6 +211,7 @@ export default {
       top 30px
       display flex
       justify-content center
+      cursor: pointer;
       p
         line-height 35px
         text-align center
@@ -140,6 +232,28 @@ export default {
           background url(../../assets/img/btn_zhuce_hover.png) no-repeat 0 0
           background-size 100% 100%
 
+    .header-info
+      height 35px
+      position absolute
+      right 0
+      top 30px
+      display flex
+      justify-content center
+      align-items center
+      cursor: pointer;
+      div
+        img
+          width 36px
+          height 36px
+          margin-right 13px
+          border-radius 50%
+      p:nth-child(2)
+        font-size 18px
+        color #FFFFFF
+      p:nth-child(3)
+        font-size 18px
+        color #FFEC1A
+        margin-left 30px
   .header-bottom
     width 868px
     height 48px

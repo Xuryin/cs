@@ -1,5 +1,6 @@
 <template>
   <div class="replacing-page">
+    <!--合约内容-->
     <div class="replacing-text" v-if="routerName == 'replacing'">
       <p>{{ replacingContract.title }}</p>
       <p>{{ replacingContract.line1 }}</p>
@@ -7,18 +8,20 @@
       <p>{{ replacingContract.line3 }}</p>
       <p>{{ replacingContract.line4 }}</p>
     </div>
-    <div class="replacing-text" v-if="routerName == 'shop'">
+    <div class="replacing-text" v-if="routerName == 'exchange'">
       <p>{{ shopContract.title }}</p>
       <p>{{ shopContract.line1 }}</p>
       <p>{{ shopContract.line2 }}</p>
       <p>{{ shopContract.line3 }}</p>
     </div>
-    <bottom/>
+    <bottom v-if="routerName == 'replacing'"/>
+    <exchange v-if="routerName == 'exchange'"/>
   </div>
 </template>
 
 <script>
 import bottom from './bottom';
+import exchange from './exchange';
 
 export default {
   name: 'index',
@@ -42,7 +45,7 @@ export default {
   },
   methods: {},
   components: {
-    bottom
+    bottom, exchange
   },
   created() {
     this.routerName = this.$route.name

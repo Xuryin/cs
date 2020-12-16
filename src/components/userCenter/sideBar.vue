@@ -2,7 +2,7 @@
   <div class="side-bar">
     <div class="side-portrait">
       <div class="portrait-img">
-        <img :src="userInfo.portrait" alt="">
+        <img :src="userInfo.avatarFull" alt="">
         <p>{{userInfo.nickname}}</p>
       </div>
 
@@ -10,55 +10,76 @@
         <div class="side-info-item">
           <div> <img src="@assets/img/icon_zhanghao.png" alt=""></div>
           <span>手机号：</span>
-          <span>{{userInfo.phone}}</span>
+          <span>{{userInfo.phoneNumber}}</span>
         </div>
 
         <div class="side-info-item">
           <div>
             <img src="@assets/img/icon_id.png" alt="">
           </div>
-          <span>手机号：</span>
+          <span>账号：</span>
           <span>{{userInfo.id}}</span>
         </div>
       </div>
 
-        <p class="side-getPrice">获得饰品金额${{userInfo.getPrice}}</p>
+        <p class="side-getPrice" v-if="false">获得饰品金额${{userInfo.getPrice}}</p>
 
       <ul class="side-nav">
-        <li v-for="item in navbar" :class="activeIndex == item.index ? 'active': ''" @click="changeState(item)">{{item.name}}</li>
+        <li v-for="item in navbar" :class="activeIndex == item.dir ? 'active': ''" @click="changeState(item)">{{item.name}}</li>
       </ul>
-
 
     </div>
   </div>
 </template>
 
 <script>
+import { logout } from '@api/user';
+import { mapMutations, mapState } from 'vuex'
+import { getItem } from '@utils/tools';
+
 export default {
   name: 'sideBar',
   data () {
     return {
-      userInfo: {
-        portrait: require('@assets/img/portrait.png'),
-        nickname: '一只小猪',
-        phone: 18315354785,
-        id: 151541,
-        getPrice: 100
-      },
       navbar: [
-        { index: 1, name: '余额充值', dir: 'recharge' },
-        { index: 2, name: '饰品取回', dir: 'recaption' },
+        { index: 1, name: '余额充值', dir: 'recharge' , tab: 0},
+        { index: 2, name: '饰品取回', dir: 'recaption' , tab: 0},
       /*  { index: 3, name: '我的邀请', dir: 'invited' },*/
         { index: 4, name: '退出登录', dir: 'logout' },
       ],
-      activeIndex: 1
+      activeIndex: 1,
+      userInfo: {},
     }
   },
   methods: {
+    ...mapMutations(['changeModalStates']),
     changeState (item) {
-      this.activeIndex = item.index
-      this.$router.push({name: item.dir})
+      this.activeIndex = item.dir
+      if (item.index == 4) {
+        this.$store.commit('changeModalStates', {index: 2, subTitle: '您确定要退出登录吗?', name: 'logout', modalTitle: '提示'})
+      } else {
+        this.$router.push({name: item.dir, query: {tab: item.tab}})
+      }
+    },
+    getUserInfo () {
+      this.userInfo = getItem('userInfo')
+      console.log(this.userInfo)
     }
+  },
+  watch: {
+    $route: {
+      handler: function (val, oldVal) {
+        console.log(val.name)
+        this.activeIndex = val.name
+      },
+      deep: true
+    }
+  },
+  computed: {
+  },
+  created() {
+    this.activeIndex = this.$route.name
+    this.getUserInfo()
   }
 };
 </script>
